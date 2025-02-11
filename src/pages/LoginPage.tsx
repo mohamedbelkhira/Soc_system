@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-provider";
 import { Lock, Mail, AlertCircle } from "lucide-react";
+import loginImage from "@/assets/images/login/soc_image.jpg";
 
 const LoginPage = () => {
   const { login, isAuthenticated } = useAuth();
@@ -29,20 +30,17 @@ const LoginPage = () => {
   }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent form submission
-    
+    e.preventDefault();
     if (isLoading) return;
-    
     setIsLoading(true);
-    setError(""); // Clear previous errors
+    setError("");
 
     try {
       await login(username, password);
-      // Navigation will be handled by the useEffect when isAuthenticated changes
     } catch (err) {
       console.log("Login error in component:", err);
       setError("Identifiants invalides. Veuillez réessayer.");
-      setPassword(""); // Clear password on error
+      setPassword("");
     } finally {
       setIsLoading(false);
     }
@@ -50,73 +48,94 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="w-full max-w-md">
-        <Card className="border-none shadow-lg">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">Bienvenue</CardTitle>
-            <CardDescription>
-              Veuillez entrer vos identifiants pour continuer
-            </CardDescription>
-          </CardHeader>
+      <div className="w-full max-w-6xl flex rounded-xl shadow-2xl overflow-hidden">
+        {/* Image Section - Hidden on mobile */}
+        <div className="hidden md:block w-3/5 bg-blue-600 relative">
+          <img
+            src={loginImage}
+            alt="CERT-SM Security Operations Center"
+            className="w-full h-full object-cover opacity-90"
+          />
+          <div className="absolute inset-0 bg-blue-900/40" />
+          <div className="absolute top-8 left-8">
+            <h1 className="text-4xl font-bold text-white mb-2">CERT-SM</h1>
+            <div className="h-1 w-20 bg-blue-400 rounded"/>
+          </div>
+          <div className="absolute bottom-12 left-8 max-w-lg">
+            <h2 className="text-3xl font-bold mb-4 text-white">Centre de cybersécurité</h2>
+            <p className="text-lg text-blue-100">Votre partenaire de confiance pour la sécurité informatique et la gestion des incidents</p>
+          </div>
+        </div>
 
-          <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="username">Nom d'utilisateur</Label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+        {/* Login Form Section */}
+        <div className="w-full md:w-2/5 bg-white dark:bg-gray-800">
+          <Card className="border-none h-full">
+            <CardHeader className="space-y-2 text-center pt-12">
+              <CardTitle className="text-3xl font-bold">CERT-SM</CardTitle>
+              <CardDescription className="text-lg">
+                Portail d'authentification
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-8 px-12 pt-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="username" className="text-base">Nom d'utilisateur</Label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <Input
+                      id="username"
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="pl-10 h-12 text-base"
+                      required
+                      disabled={isLoading}
+                      placeholder="Nom d'utilisateur"
+                    />
                   </div>
-                  <Input
-                    id="username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="pl-10"
-                    required
-                    disabled={isLoading}
-                    placeholder="Nom d'utilisateur"
-                  />
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-base">Mot de passe</Label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 h-12 text-base"
+                      required
+                      disabled={isLoading}
+                      placeholder="••••••••"
+                    />
                   </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                    disabled={isLoading}
-                    placeholder="••••••••"
-                  />
+                  {error && (
+                    <div className="flex items-center gap-2 mt-2 text-destructive text-sm">
+                      <AlertCircle className="h-4 w-4" />
+                      <span>{error}</span>
+                    </div>
+                  )}
                 </div>
-                {error && (
-                  <div className="flex items-center gap-2 mt-2 text-destructive text-sm">
-                    <AlertCircle className="h-4 w-4" />
-                    <span>{error}</span>
-                  </div>
-                )}
-              </div>
 
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isLoading}
-              >
-                {isLoading ? "Connexion en cours..." : "Se connecter"}
-              </Button>
-            </form>
-          </CardContent>
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 text-base font-semibold mt-4" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Connexion en cours..." : "Se connecter"}
+                </Button>
+              </form>
+            </CardContent>
 
-          <CardFooter className="flex flex-col space-y-4 items-center" />
-        </Card>
+            <CardFooter className="flex flex-col space-y-4 items-center" />
+          </Card>
+        </div>
       </div>
     </div>
   );
