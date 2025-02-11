@@ -1,0 +1,6 @@
+export enum StockMovementType {
+  TRANSFER = "TRANSFER",
+  PURCHASE_RECEIVE = "PURCHASE_RECEIVE",
+  SALE_DISPATCH = "SALE_DISPATCH",
+  QUOTE = "QUOTE",
+}

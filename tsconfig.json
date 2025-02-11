@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+     "noEmit": true,
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "noEmitOnError": true,       // Allow emitting JS files even if there are type errors
+    "skipLibCheck": true          // Skip type checking of declaration files
+  },
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
