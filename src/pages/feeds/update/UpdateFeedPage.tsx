@@ -1,5 +1,5 @@
-// src/components/create/CreateFeedDialog.tsx
-import { useState } from "react";
+// src/components/update/UpdateFeedDialog.tsx
+import { useEffect, useState } from "react";
 import {
   Form,
   FormControl,
@@ -11,46 +11,67 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { showToast } from "@/utils/showToast";
 import { AxiosError } from "axios";
 import { ApiErrorResponse } from "@/types/error.type";
 import CustomDialog from "@/components/common/CustomDialog";
-import AddButton from "@/components/common/AddButton";
-import z from "zod";
-import { createFeedSchema } from "@/schemas/feeds/feed.schema";
-import { CreateFeedDTO } from "@/dto/feed.dto";
+import { UpdateFeedDTO } from "@/dto/feed.dto";
+import { updateFeedSchema } from "@/schemas/feeds/feed.schema";
 import { feedsApi } from "@/api/feeds.api";
+import UpdateAction from "@/components/common/actions/UpdateAction";
+import { FeedResponse } from "@/dto/feed.dto";
 
-export function CreateFeedDialog({ onCreate }: { onCreate?: () => void }) {
+export function UpdateFeedDialog({
+  feed,
+  onUpdate,
+}: {
+    feed: FeedResponse;
+  onUpdate?: () => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<z.infer<typeof createFeedSchema>>({
-    resolver: zodResolver(createFeedSchema),
+  const form = useForm<UpdateFeedDTO>({
+    resolver: zodResolver(updateFeedSchema),
     defaultValues: {
-      url: "",
-      title: "",
-      description: "",
-      active: true,
-      tags: [], // optional array of tag IDs if applicable
+      feedId: feed.feedId,
+      url: feed.url,
+      title: feed.title || "",
+      description: feed.description || "",
+      active: feed.active,
+      tags: feed.tags ? feed.tags.map(tag => tag.tagId) : [],
     },
   });
 
-  const onSubmit = async (values: CreateFeedDTO) => {
+  // Reset form values when the dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      form.reset({
+        feedId: feed.feedId,
+        url: feed.url,
+        title: feed.title || "",
+        description: feed.description || "",
+        active: feed.active,
+        tags: feed.tags ? feed.tags.map(tag => tag.tagId) : [],
+      });
+    }
+  }, [isOpen, feed, form]);
+
+  const onSubmit = async (values: UpdateFeedDTO) => {
     setIsSubmitting(true);
     try {
-      const response = await feedsApi.create(values);
+      const response = await feedsApi.update(feed.feedId, values);
       showToast(response.status, response.message);
       setIsOpen(false);
-      form.reset();
-      onCreate?.();
+      onUpdate?.();
     } catch (err) {
       const error = err as AxiosError;
       showToast(
         "error",
-        (error.response?.data as ApiErrorResponse).message || "Failed to create feed"
+        (error.response?.data as ApiErrorResponse).message || "Failed to update feed"
       );
       console.error(error);
     } finally {
@@ -60,8 +81,8 @@ export function CreateFeedDialog({ onCreate }: { onCreate?: () => void }) {
 
   return (
     <CustomDialog
-      trigger={<AddButton label="Add Feed" />}
-      title="Create New Feed"
+      trigger={<UpdateAction />}
+      title="Update Feed"
       isOpen={isOpen}
       onOpenChange={setIsOpen}
     >
@@ -112,6 +133,26 @@ export function CreateFeedDialog({ onCreate }: { onCreate?: () => void }) {
             )}
           />
 
+          {/* Active Switch */}
+          <FormField
+            control={form.control}
+            name="active"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between p-3">
+                <div className="space-y-0.5">
+                  <FormLabel>Active</FormLabel>
+                  <FormMessage />
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
           {/* Action Buttons */}
           <div className="flex justify-end gap-2">
             <Button
@@ -123,7 +164,7 @@ export function CreateFeedDialog({ onCreate }: { onCreate?: () => void }) {
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create"}
+              {isSubmitting ? "Updating..." : "Update"}
             </Button>
           </div>
         </form>
@@ -132,4 +173,4 @@ export function CreateFeedDialog({ onCreate }: { onCreate?: () => void }) {
   );
 }
 
-export default CreateFeedDialog;
+export default UpdateFeedDialog;

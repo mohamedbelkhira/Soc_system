@@ -1,5 +1,4 @@
-// src/components/update/UpdateSupplierDialog.tsx
-
+// src/components/update/UpdateFeedDialog.tsx
 import { useEffect, useState } from "react";
 import {
   Form,
@@ -19,52 +18,52 @@ import { showToast } from "@/utils/showToast";
 import { AxiosError } from "axios";
 import { ApiErrorResponse } from "@/types/error.type";
 import CustomDialog from "@/components/common/CustomDialog";
-import { UpdateSupplierDTO } from "@/types/supplier.dto";
-import { suppliersApi } from "@/api/suppliers.api";
-import { updateSupplierSchema } from "@/types/supplier.dto";
+import { UpdateFeedDTO } from "@/dto/feed.dto";
+import { updateFeedSchema } from "@/schemas/feeds/feed.schema";
+import { feedsApi } from "@/api/feeds.api";
 import UpdateAction from "@/components/common/actions/UpdateAction";
-import { Supplier } from "@/types/supplier.dto";
+import { Feed } from "@/dto/feed.dto";
 
-export function UpdateSupplierDialog({
-  supplier,
+export function UpdateFeedDialog({
+  feed,
   onUpdate,
 }: {
-  supplier: Supplier;
+  feed: Feed;
   onUpdate?: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<UpdateSupplierDTO>({
-    resolver: zodResolver(updateSupplierSchema),
+  const form = useForm<UpdateFeedDTO>({
+    resolver: zodResolver(updateFeedSchema),
     defaultValues: {
-      id:supplier.id,
-      name: supplier.name,
-      description: supplier.description,
-      phoneNumber: supplier.phoneNumber,
-      address: supplier.address,
-      isActive: supplier.isActive,
+      feedId: feed.feedId,
+      url: feed.url,
+      title: feed.title || "",
+      description: feed.description || "",
+      active: feed.active,
+      tags: feed.tags ? feed.tags.map(tag => tag.tagId) : [],
     },
   });
 
+  // Reset form values when the dialog opens
   useEffect(() => {
     if (isOpen) {
       form.reset({
-        id:supplier.id,
-        name: supplier.name,
-        description: supplier.description,
-        phoneNumber: supplier.phoneNumber,
-        address: supplier.address,
-        isActive: supplier.isActive,
+        feedId: feed.feedId,
+        url: feed.url,
+        title: feed.title || "",
+        description: feed.description || "",
+        active: feed.active,
+        tags: feed.tags ? feed.tags.map(tag => tag.tagId) : [],
       });
     }
-  }, [isOpen, supplier, form]);
+  }, [isOpen, feed, form]);
 
-  const onSubmit = async (values: UpdateSupplierDTO) => {
+  const onSubmit = async (values: UpdateFeedDTO) => {
     setIsSubmitting(true);
-
     try {
-      const response = await suppliersApi.update(supplier.id, values);
+      const response = await feedsApi.update(feed.feedId, values);
       showToast(response.status, response.message);
       setIsOpen(false);
       onUpdate?.();
@@ -72,8 +71,7 @@ export function UpdateSupplierDialog({
       const error = err as AxiosError;
       showToast(
         "error",
-        (error.response?.data as ApiErrorResponse).message ||
-          "Échec de la mise à jour du fournisseur"
+        (error.response?.data as ApiErrorResponse).message || "Failed to update feed"
       );
       console.error(error);
     } finally {
@@ -84,24 +82,36 @@ export function UpdateSupplierDialog({
   return (
     <CustomDialog
       trigger={<UpdateAction />}
-      title="Modifier le fournisseur"
+      title="Update Feed"
       isOpen={isOpen}
       onOpenChange={setIsOpen}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {/* Name */}
+          {/* Feed URL */}
           <FormField
             control={form.control}
-            name="name"
+            name="url"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nom du fournisseur</FormLabel>
+                <FormLabel>Feed URL</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="Saisir le nom du fournisseur"
-                    {...field}
-                  />
+                  <Input placeholder="Enter feed URL" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Title */}
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter feed title" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -116,61 +126,21 @@ export function UpdateSupplierDialog({
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea
-                    placeholder="Saisir la description du fournisseur"
-                    {...field}
-                  />
+                  <Textarea placeholder="Enter feed description" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Phone Number */}
+          {/* Active Switch */}
           <FormField
             control={form.control}
-            name="phoneNumber"
+            name="active"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Numéro de Téléphone</FormLabel>
-                <FormControl>
-                  <Input
-                    type="tel"
-                    placeholder="Ex: 0566884577"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Address */}
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Adresse</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Saisir l'adresse du fournisseur"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Is Active */}
-          <FormField
-            control={form.control}
-            name="isActive"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg p-3">
+              <FormItem className="flex flex-row items-center justify-between p-3">
                 <div className="space-y-0.5">
-                  <FormLabel>Activer le fournisseur</FormLabel>
+                  <FormLabel>Active</FormLabel>
                   <FormMessage />
                 </div>
                 <FormControl>
@@ -191,10 +161,10 @@ export function UpdateSupplierDialog({
               onClick={() => setIsOpen(false)}
               disabled={isSubmitting}
             >
-              Annuler
+              Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Mise à jour..." : "Mettre à jour"}
+              {isSubmitting ? "Updating..." : "Update"}
             </Button>
           </div>
         </form>
@@ -203,4 +173,4 @@ export function UpdateSupplierDialog({
   );
 }
 
-export default UpdateSupplierDialog;
+export default UpdateFeedDialog;

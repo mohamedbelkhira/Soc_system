@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-provider";
-import { Lock, Mail, AlertCircle } from "lucide-react";
+import { Lock, Mail, AlertCircle, Shield } from "lucide-react";
 import loginImage from "@/assets/images/login/soc_image.jpg";
 
 const LoginPage = () => {
@@ -47,50 +47,57 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background dark:bg-background px-4">
       <div className="w-full max-w-6xl flex rounded-xl shadow-2xl overflow-hidden">
         {/* Image Section - Hidden on mobile */}
-        <div className="hidden md:block w-3/5 bg-blue-600 relative">
+        <div className="hidden md:block w-3/5 bg-primary relative">
           <img
             src={loginImage}
             alt="CERT-SM Security Operations Center"
-            className="w-full h-full object-cover opacity-90"
+            className="w-full h-full object-cover opacity-85 mix-blend-overlay"
           />
-          <div className="absolute inset-0 bg-blue-900/40" />
+           <div className="absolute inset-0 bg-[#1a472a]/80 dark:bg-[#1a472a]/70" />
+
           <div className="absolute top-8 left-8">
-            <h1 className="text-4xl font-bold text-white mb-2">CERT-SM</h1>
-            <div className="h-1 w-20 bg-blue-400 rounded"/>
+            <div className="flex items-center gap-3">
+              <Shield className="h-8 w-8 text-primary-foreground" />
+              <h1 className="text-4xl font-bold text-primary-foreground">CERT-SM</h1>
+            </div>
+            <div className="h-1 w-20 bg-accent mt-2 rounded"/>
           </div>
           <div className="absolute bottom-12 left-8 max-w-lg">
-            <h2 className="text-3xl font-bold mb-4 text-white">Centre de cybersécurité</h2>
-            <p className="text-lg text-blue-100">Votre partenaire de confiance pour la sécurité informatique et la gestion des incidents</p>
+            <h2 className="text-3xl font-bold mb-4 text-primary-foreground">Centre de cybersécurité</h2>
+            <p className="text-lg text-primary-foreground/90">Protection, Détection, Réponse - Votre partenaire de confiance pour la sécurité informatique</p>
           </div>
         </div>
 
         {/* Login Form Section */}
-        <div className="w-full md:w-2/5 bg-white dark:bg-gray-800">
+        <div className="w-full md:w-2/5 bg-card dark:bg-card">
           <Card className="border-none h-full">
             <CardHeader className="space-y-2 text-center pt-12">
-              <CardTitle className="text-3xl font-bold">CERT-SM</CardTitle>
-              <CardDescription className="text-lg">
-                Portail d'authentification
+              <div className="flex justify-center mb-4">
+                <Shield className="h-12 w-12 text-primary" />
+              </div>
+              <CardTitle className="text-3xl font-bold text-card-foreground">CERT-SM</CardTitle>
+              <CardDescription className="text-lg text-muted-foreground">
+                Portail d'authentification sécurisé
               </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-8 px-12 pt-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="username" className="text-base">Nom d'utilisateur</Label>
+                  <Label htmlFor="username" className="text-base text-card-foreground">Nom d'utilisateur</Label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400" />
+                      <Mail className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <Input
                       id="username"
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="pl-10 h-12 text-base"
+                      className="pl-10 h-12 text-base bg-background dark:bg-secondary border-input"
                       required
                       disabled={isLoading}
                       placeholder="Nom d'utilisateur"
@@ -99,17 +106,17 @@ const LoginPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-base">Mot de passe</Label>
+                  <Label htmlFor="password" className="text-base text-card-foreground">Mot de passe</Label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-400" />
+                      <Lock className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <Input
                       id="password"
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 h-12 text-base"
+                      className="pl-10 h-12 text-base bg-background dark:bg-secondary border-input"
                       required
                       disabled={isLoading}
                       placeholder="••••••••"
@@ -125,7 +132,7 @@ const LoginPage = () => {
 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 text-base font-semibold mt-4" 
+                  className="w-full h-12 text-base font-semibold mt-4 bg-primary text-primary-foreground hover:bg-primary/90" 
                   disabled={isLoading}
                 >
                   {isLoading ? "Connexion en cours..." : "Se connecter"}
@@ -133,7 +140,11 @@ const LoginPage = () => {
               </form>
             </CardContent>
 
-            <CardFooter className="flex flex-col space-y-4 items-center" />
+            <CardFooter className="flex flex-col space-y-4 items-center pt-6">
+              <p className="text-sm text-muted-foreground">
+                Système de gestion des incidents de sécurité
+              </p>
+            </CardFooter>
           </Card>
         </div>
       </div>
