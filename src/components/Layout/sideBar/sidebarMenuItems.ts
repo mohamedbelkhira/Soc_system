@@ -1,21 +1,17 @@
+
 import {
-  Box,
-  Clock,
-  Container,
-  CreditCard,
+ 
   Euro,
-  HandCoins,
+ 
   Home,
   KeySquare,
-  PlaneLanding,
+  
   Settings,
-  ShoppingBag,
-  ShoppingCart,
-  SwatchBook,
-  Tag,
-  Truck,
+  
   Users,
-  Wallet,
+
+  Rss,
+  Newspaper,
 } from "lucide-react";
 
 export interface MenuItem {
@@ -45,65 +41,25 @@ export const menuGroups: MenuGroup[] = [
     ],
   },
   {
-    group: "Ventes",
+    group: "Feeds",
     icon: Euro,
     items: [
       {
-        title: "Magasin",
-        url: "/store-sales",
-        icon: ShoppingBag,
+        title: "RSS-Feeds",
+        url: "/feeds-items",
+        icon: Newspaper,
       },
       {
-        title: "En ligne",
-        url: "/online-sales",
-        icon: ShoppingCart,
-      },
-      {
-        title: "Avance",
-        url: "/advance-sales",
-        icon: Clock,
-      },
+        title: "RSS-Sources",
+        url: "/feeds",
+        icon: Rss,
+      }
+    
     ],
   },
+
   {
-    group: "Gestion des achats",
-    icon: PlaneLanding,
-    items: [
-      {
-        title: "Achats",
-        url: "/purchases",
-        icon: PlaneLanding,
-      },
-      {
-        title: "Frais des achats",
-        url: "/purchase-fee",
-        icon: HandCoins,
-      },
-    ],
-  },
-  {
-    group: "Gestion des Produits",
-    icon: Box,
-    items: [
-      {
-        title: "Produits",
-        url: "/products",
-        icon: Box,
-      },
-      {
-        title: "Catégories de produits",
-        url: "/categories",
-        icon: Tag,
-      },
-      {
-        title: "Attributs des variantes",
-        url: "/attributes",
-        icon: SwatchBook,
-      },
-    ],
-  },
-  {
-    group: "Gestion du magasin",
+    group: "Management",
     icon: Settings,
     items: [
       {
@@ -116,37 +72,7 @@ export const menuGroups: MenuGroup[] = [
         url: "/employees",
         icon: Users,
       },
-      {
-        title: "Dépenses",
-        url: "/expenses",
-        icon: CreditCard,
-      },
-      {
-        title: "Catégories des depenses",
-        url: "/expenses-categories",
-        icon: Wallet,
-      },
     ],
-  },
-  {
-    group: "Gestion des Relations",
-    icon: Users,
-    items: [
-      {
-        title: "Clients",
-        url: "/clients",
-        icon: Users,
-      },
-      {
-        title: "Fournisseurs",
-        url: "/suppliers",
-        icon: Container,
-      },
-      {
-        title: "Livraison",
-        url: "/delivery",
-        icon: Truck,
-      },
-    ],
-  },
+  }
+  
 ];

@@ -53,7 +53,7 @@ const LoginPage = () => {
         <div className="hidden md:block w-3/5 bg-primary relative">
           <img
             src={loginImage}
-            alt="CERT-SM Security Operations Center"
+            alt="DSD - System de supervision et de détection"
             className="w-full h-full object-cover opacity-85 mix-blend-overlay"
           />
            <div className="absolute inset-0 bg-[#1a472a]/80 dark:bg-[#1a472a]/70" />
@@ -61,13 +61,13 @@ const LoginPage = () => {
           <div className="absolute top-8 left-8">
             <div className="flex items-center gap-3">
               <Shield className="h-8 w-8 text-primary-foreground" />
-              <h1 className="text-4xl font-bold text-primary-foreground">CERT-SM</h1>
+              <h1 className="text-4xl font-bold text-primary-foreground">DSD-ASSI</h1>
             </div>
             <div className="h-1 w-20 bg-accent mt-2 rounded"/>
           </div>
           <div className="absolute bottom-12 left-8 max-w-lg">
-            <h2 className="text-3xl font-bold mb-4 text-primary-foreground">Centre de cybersécurité</h2>
-            <p className="text-lg text-primary-foreground/90">Protection, Détection, Réponse - Votre partenaire de confiance pour la sécurité informatique</p>
+            <h2 className="text-3xl font-bold mb-4 text-primary-foreground">CNOSSI</h2>
+            <p className="text-lg text-primary-foreground/90">supervision et Détection</p>
           </div>
         </div>
 
@@ -78,7 +78,7 @@ const LoginPage = () => {
               <div className="flex justify-center mb-4">
                 <Shield className="h-12 w-12 text-primary" />
               </div>
-              <CardTitle className="text-3xl font-bold text-card-foreground">CERT-SM</CardTitle>
+              <CardTitle className="text-3xl font-bold text-card-foreground">DSD-ASSI</CardTitle>
               <CardDescription className="text-lg text-muted-foreground">
                 Portail d'authentification sécurisé
               </CardDescription>
@@ -142,7 +142,7 @@ const LoginPage = () => {
 
             <CardFooter className="flex flex-col space-y-4 items-center pt-6">
               <p className="text-sm text-muted-foreground">
-                Système de gestion des incidents de sécurité
+                Système de supervision et de détection
               </p>
             </CardFooter>
           </Card>

@@ -4,6 +4,7 @@ import LoadingBar from "@/components/Layout/LoadingBar.js";
 import { useAuth } from "@/contexts/auth-provider";
 
 import FeedsPage from "@/pages/feeds/FeedsPage";
+import FeedItemsPage from "@/pages/FeedItems/FeedItemsPage";
 const Layout = lazy(() => import("@/layouts/layout.js"));
 // Lazy load pages
 const LoginPage = lazy(() => import("@/pages/LoginPage.js"));
@@ -26,13 +27,14 @@ const ProtectedLayout = () => {
     // Save the attempted location for redirect after login
     return <Navigate to="/login" />;
   }
-
+  
   return  (
     <Layout>
       <Suspense fallback={<LoadingBar />}>
         <Routes>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/feeds" element={<FeedsPage />} />
+          <Route path="/feeds-items" element={<FeedItemsPage />} />
           <Route path="/roles" element={<RolesPage />} />
           <Route path="/role_add" element={<CreateRolePage />} />
           <Route path="/role_update/:id" element={<UpdateRolePage />} />
