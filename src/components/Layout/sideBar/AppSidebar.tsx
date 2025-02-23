@@ -12,7 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Store } from "lucide-react";
+import {ShieldCheck } from "lucide-react";
 
 import { MenuGroup, menuGroups } from "./sidebarMenuItems";
 
@@ -61,15 +61,18 @@ const AppSidebar: React.FC = () => {
             className="absolute -bottom-6 -right-6 w-16 aspect-square rounded-full"
           />
           <div className="bg-[#1565C0] p-2 rounded-md">
-            <Store size={20} className="text-white" />
+            <ShieldCheck size={20} className="text-white" />
           </div>
           <div className="relative z-10 flex flex-col">
-            <span className="leading-5 text-lg">Code Crafters</span>
-            <span className="text-sm text-white/85">DZ-POS</span>
+            <span className="leading-5 text-lg">DSD</span>
+            <span className="text-sm text-white/85">supervision & detection</span>
           </div>
         </div>
       </SidebarHeader>
-      <SidebarContent>
+
+
+      {/* <SidebarContent className="pt-5"> */}
+      <SidebarContent >
         {menuGroups.map((group) => (
           <SidebarGroup key={group.group} className="pb-2">
             <SidebarGroupLabel className="font-medium">

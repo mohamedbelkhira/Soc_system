@@ -142,7 +142,7 @@ const LoginPage = () => {
 
             <CardFooter className="flex flex-col space-y-4 items-center pt-6">
               <p className="text-sm text-muted-foreground">
-                Système de supervision et de détection
+                Système de supervision et de détection+
               </p>
             </CardFooter>
           </Card>

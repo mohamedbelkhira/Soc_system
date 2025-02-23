@@ -55,7 +55,8 @@ export const feedItemsApi = {
 
   // Helper method to get feed items by feed ID
   getByFeedId: async (feedId: string): Promise<ApiResponse<FeedItemResponse[]>> => {
-    const response: AxiosResponse<ApiResponse<FeedItemResponse[]>> = await apiClient.get(`/?feedId=${feedId}`);
+    console.log("feedid", feedId);
+    const response: AxiosResponse<ApiResponse<FeedItemResponse[]>> = await apiClient.get(`/feed/${feedId}`);
     return response.data;
   }
 };

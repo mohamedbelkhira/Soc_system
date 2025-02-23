@@ -68,8 +68,8 @@ export const menuGroups: MenuGroup[] = [
         icon: KeySquare,
       },
       {
-        title: "Employés",
-        url: "/employees",
+        title: "Users",
+        url: "/users",
         icon: Users,
       },
     ],

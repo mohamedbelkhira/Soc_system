@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/auth-provider";
 
 import FeedsPage from "@/pages/feeds/FeedsPage";
 import FeedItemsPage from "@/pages/FeedItems/FeedItemsPage";
+import UsersPage from "@/pages/user/UsersPage";
 const Layout = lazy(() => import("@/layouts/layout.js"));
 // Lazy load pages
 const LoginPage = lazy(() => import("@/pages/LoginPage.js"));
@@ -38,7 +39,7 @@ const ProtectedLayout = () => {
           <Route path="/roles" element={<RolesPage />} />
           <Route path="/role_add" element={<CreateRolePage />} />
           <Route path="/role_update/:id" element={<UpdateRolePage />} />
-        
+          <Route path="/users" element={<UsersPage />} />
           <Route path="/common" element={<CommonCompnentsPage />} />
 
        

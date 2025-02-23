@@ -27,23 +27,8 @@ export const permissionActions: { action: PermissionAction; label: string }[] = 
 
 export const permissionGroups: PermissionGroup[] = [
   {
-    groupName: 'Produits',
-    groupCode: 'product',
-    permissions: [],
-  },
-  {
-    groupName: 'Achats',
-    groupCode: 'purchase',
-    permissions: [],
-  },
-  {
-    groupName: 'Ventes',
-    groupCode: 'sale',
-    permissions: [],
-  },
-  {
-    groupName: 'Dépenses',
-    groupCode: 'expense',
+    groupName: 'feeds',
+    groupCode: 'feeds',
     permissions: [],
   },
   {

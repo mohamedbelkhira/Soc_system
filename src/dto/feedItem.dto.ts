@@ -1,7 +1,19 @@
+
 export interface Tag {
     tagId: string;
     name: string;
     color?: string;
+  }
+
+  export interface Feed {
+     feedId: string;
+     url: string;
+     title?: string | null;
+     description?: string | null;
+     active: boolean;
+     lastChecked?: string | null;
+     createdAt: string;
+     updatedAt: string;
   }
   
   export interface FeedItemResponse {
@@ -15,6 +27,7 @@ export interface Tag {
     readStatus: boolean;
     imageUrl?: string;
     tags: Tag[];
+    feed : Feed;
   }
   
   export interface CreateFeedItemDTO {

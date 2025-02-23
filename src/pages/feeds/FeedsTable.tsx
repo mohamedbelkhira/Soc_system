@@ -73,13 +73,13 @@ const FeedsTable: React.FC<FeedsTableProps> = ({ isLoading, feeds, onChange }) =
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <CheckPermission
-                      requiredPermission={Permission.SETTINGS_EDIT}
+                      requiredPermission={Permission.FEEDS_EDIT}
                       grantedPermissions={user?.permissions}
                     >
                       <UpdateFeedDialog feed={feed} onUpdate={onChange} />
                     </CheckPermission>
                     <CheckPermission
-                      requiredPermission={Permission.SETTINGS_DELETE}
+                      requiredPermission={Permission.FEEDS_DELETE}
                       grantedPermissions={user?.permissions}
                     >
                       <DeleteFeedDialog feed={feed} onDelete={onChange} />

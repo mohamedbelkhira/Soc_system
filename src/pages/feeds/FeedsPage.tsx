@@ -41,7 +41,7 @@ export function FeedsPage() {
       <PageHeader className="flex flex-row items-center justify-between" showBackButton>
         <PageTitle>Gestion des Flux</PageTitle>
         <CheckPermission
-          requiredPermission={Permission.SETTINGS_CREATE}
+          requiredPermission={Permission.FEEDS_CREATE}
           grantedPermissions={user?.permissions}
         >
           <CreateFeedDialog onCreate={fetchFeeds} />

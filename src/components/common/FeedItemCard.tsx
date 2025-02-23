@@ -7,7 +7,9 @@ import {
   CheckCircle, 
   XCircle,
   Calendar,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Image,
+  Rss
 } from 'lucide-react';
 import {
   Card,
@@ -54,112 +56,94 @@ const FeedItemCard = ({ item, onReadStatusChange, onDelete }: FeedItemCardProps)
     navigator.clipboard.writeText(item.link);
   };
 
-  return (
-    <Card className="group relative hover:shadow-lg transition-all duration-300 overflow-hidden">
-      {/* Image Container - Now sits at the very top of the card */}
+  const ImageContainer = () => (
+    <div className="w-full h-48 relative">
       {item.imageUrl ? (
-        <div className="w-full h-48 relative">
-          <img
-            src={item.imageUrl}
-            alt={item.title || 'Feed item'}
-            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
-          />
-          {/* Status indicator and dropdown - Positioned over the image */}
-          <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="bg-background/80 rounded-full p-1">
-                  {item.readStatus ? (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  ) : (
-                    <Clock className="h-5 w-5 text-yellow-500" />
-                  )}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                {item.readStatus ? 'Read' : 'Unread'}
-              </TooltipContent>
-            </Tooltip>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 bg-background/80 hover:bg-background">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleReadToggle}>
-                  Mark as {item.readStatus ? 'unread' : 'read'}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleCopyLink}>
-                  <LinkIcon className="mr-2 h-4 w-4" />
-                  Copy link
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {onDelete && (
-                  <DropdownMenuItem
-                    className="text-red-600"
-                    onClick={() => onDelete(item.itemId)}
-                  >
-                    Delete
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+        <img
+          src={item.imageUrl}
+          alt={item.title || 'Feed item'}
+          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
+      ) : (
+        <div className="w-full h-full bg-muted flex items-center justify-center">
+          <div className="text-center">
+            <Image className="h-12 w-12 mx-auto text-muted-foreground/50" />
+            <p className="text-sm text-muted-foreground mt-2">No image available</p>
           </div>
         </div>
-      ) : (
-        <div className="h-12" /> // Smaller height when no image
       )}
+      
+      {/* Status indicator and dropdown - Positioned over the image/placeholder */}
+      <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="bg-background/80 rounded-full p-1">
+              {item.readStatus ? (
+                <CheckCircle className="h-5 w-5 text-green-500" />
+              ) : (
+                <Clock className="h-5 w-5 text-yellow-500" />
+              )}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            {item.readStatus ? 'Read' : 'Unread'}
+          </TooltipContent>
+        </Tooltip>
 
-      <CardHeader className={item.imageUrl ? "pt-4" : "relative"}>
-        {/* Show status indicator here only if there's no image */}
-        {!item.imageUrl && (
-          <div className="absolute top-4 right-4 flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div>
-                  {item.readStatus ? (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  ) : (
-                    <Clock className="h-5 w-5 text-yellow-500" />
-                  )}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                {item.readStatus ? 'Read' : 'Unread'}
-              </TooltipContent>
-            </Tooltip>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 bg-background/80 hover:bg-background">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleReadToggle}>
+              Mark as {item.readStatus ? 'unread' : 'read'}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleCopyLink}>
+              <LinkIcon className="mr-2 h-4 w-4" />
+              Copy link
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {onDelete && (
+              <DropdownMenuItem
+                className="text-red-600"
+                onClick={() => onDelete(item.itemId)}
+              >
+                Delete
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleReadToggle}>
-                  Mark as {item.readStatus ? 'unread' : 'read'}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleCopyLink}>
-                  <LinkIcon className="mr-2 h-4 w-4" />
-                  Copy link
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {onDelete && (
-                  <DropdownMenuItem
-                    className="text-red-600"
-                    onClick={() => onDelete(item.itemId)}
-                  >
-                    Delete
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
+      {/* Source badge - Positioned over the image/placeholder */}
+      <div className="absolute bottom-2 left-2 z-10">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Badge 
+              variant="secondary" 
+              className="bg-background/80 hover:bg-background/90 transition-colors flex items-center gap-1"
+            >
+              <Rss className="h-3 w-3" />
+              <span className="truncate max-w-[200px]">{item.feed?.title || 'Unknown Feed'}</span>
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+  {item.feed?.title || 'Unknown Feed'}
+        </TooltipContent>
 
+        </Tooltip>
+      </div>
+    </div>
+  );
+
+  return (
+    <Card className="group relative hover:shadow-lg transition-all duration-300 overflow-hidden">
+      <ImageContainer />
+
+      <CardHeader className="pt-4">
         <CardTitle className="line-clamp-2 hover:text-primary transition-colors">
           {item.title || 'Untitled'}
         </CardTitle>

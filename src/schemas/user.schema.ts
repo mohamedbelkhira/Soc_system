@@ -11,7 +11,15 @@ export const createUserSchema = z.object({
 export const updateUserSchema = z.object({
   id: z.string().uuid("ID d'utilisateur non valide").optional(),
   username: z.string().min(3, "Le nom d'utilisateur doit comporter au moins 3 caractères").optional(),
-  password: z.string().min(6, "Le mot de passe doit comporter au moins 6 caractères").optional(),
+  password: z.preprocess(
+    (val) => {
+      if (typeof val === "string" && val.trim() === "") {
+        return undefined;
+      }
+      return val;
+    },
+    z.string().min(6, "Le mot de passe doit comporter au moins 6 caractères").optional()
+  ),
   roleId: z.string().uuid("ID de rôle non valide").optional(),
   isActive: z.boolean().optional(),
 });
