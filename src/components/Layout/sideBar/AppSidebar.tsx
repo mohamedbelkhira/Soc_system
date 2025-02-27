@@ -51,23 +51,25 @@ const AppSidebar: React.FC = () => {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="group-data-[collapsible=icon]:hidden">
-        <div className="relative overflow-hidden  px-3 py-1.5 rounded-md bg-[#1E88E5] flex items-center gap-6 text-xl text-white font-medium">
-          <div
-            style={{ backgroundColor: "#409CEB90" }}
-            className="absolute -top-6 -right-6 w-20 aspect-square rounded-full"
-          />
-          <div
-            style={{ backgroundColor: "#459EECa0" }}
-            className="absolute -bottom-6 -right-6 w-16 aspect-square rounded-full"
-          />
-          <div className="bg-[#1565C0] p-2 rounded-md">
-            <ShieldCheck size={20} className="text-white" />
-          </div>
-          <div className="relative z-10 flex flex-col">
-            <span className="leading-5 text-lg">DSD</span>
-            <span className="text-sm text-white/85">supervision & detection</span>
-          </div>
+      <div className="group-data-[collapsible=icon]:hidden">
+      <div className="relative overflow-hidden px-3 py-1.5 rounded-md bg-emerald-600 flex items-center gap-6 text-xl text-white font-medium">
+        <div
+          style={{ backgroundColor: "rgba(52, 211, 153, 0.56)" }}
+          className="absolute -top-6 -right-6 w-20 aspect-square rounded-full"
+        />
+        <div
+          style={{ backgroundColor: "rgba(52, 211, 153, 0.63)" }}
+          className="absolute -bottom-6 -right-6 w-16 aspect-square rounded-full"
+        />
+        <div className="bg-emerald-700 p-2 rounded-md">
+          <ShieldCheck size={20} className="text-white" />
         </div>
+        <div className="relative z-10 flex flex-col">
+          <span className="leading-5 text-lg">DSD</span>
+          <span className="text-sm text-white/85">supervision & detection</span>
+        </div>
+      </div>
+    </div>
       </SidebarHeader>
 
 
