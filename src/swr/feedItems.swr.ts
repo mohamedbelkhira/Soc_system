@@ -1,66 +1,66 @@
 import useSWR from 'swr';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { feedItemsApi } from '@/api/feedItems.api';
 import { FeedItemResponse } from '@/dto/feedItem.dto';
 import { PaginatedResponse } from '@/types/pagination.type';
 
+const FEED_ITEMS_KEY = "feed-items";
+const getPaginatedFeedItemsKey = (params: URLSearchParams) => {
+  return `${FEED_ITEMS_KEY}?${params.toString()}`;
+};
+
 /**
- * Custom SWR hook for fetching feed items with pagination and filters
+ * Custom SWR hook for fetching feed items with pagination and filters.
+ * This hook returns data in a structure similar to the products hook.
  */
 export function useFeedItems(searchParams: URLSearchParams) {
-  // Create a key that includes all search parameters for SWR caching
-  const key = `/feeds-items?${searchParams.toString()}`;
+  // Memoize the key so that it only changes when the actual query string changes
+  const key = useMemo(() => getPaginatedFeedItemsKey(searchParams), [searchParams.toString()]);
   
   // Extract feedId for conditional fetching
   const feedId = searchParams.get('feedId');
   
   // Define the fetcher function based on whether feedId is present
   const fetcher = useCallback(async () => {
-    // eslint-disable-next-line no-useless-catch
-    try {
-      console.log('SWR key:', `/feeds-items?${searchParams.toString()}`);
-
-      let response;
-      if (feedId) {
-        response = await feedItemsApi.getByFeedId(feedId, searchParams);
-      } else {
-        response = await feedItemsApi.getAll(searchParams);
-      }
-      
-      return response.data;
-    } catch (error) {
-      throw error;
+    console.log('SWR key:', key);
+    let response;
+    if (feedId) {
+      response = await feedItemsApi.getByFeedId(feedId, searchParams);
+    } else {
+      response = await feedItemsApi.getAll(searchParams);
     }
-  }, [searchParams, feedId]);
+    return response.data;
+  }, [searchParams, feedId, key]);
 
-  // Use SWR to fetch the data
+  // Use SWR to fetch the data using the memoized key and additional options
   const { data, error, isLoading, mutate } = useSWR<PaginatedResponse<FeedItemResponse>>(
     key,
-    fetcher
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      keepPreviousData: true,
+    }
   );
 
   // Helper function to mark an item as read/unread and update the cache
   const updateReadStatus = useCallback(async (itemId: string, status: boolean) => {
-    // eslint-disable-next-line no-useless-catch
     try {
       const response = await feedItemsApi.updateReadStatus(itemId, status);
-      
       if (response.status === 'success') {
-        // Update the cached data without requiring a refetch
+        // Update cached data without a full refetch
         mutate(
           (currentData) => {
             if (!currentData) return currentData;
-            
             return {
               ...currentData,
-              items: currentData.items.map(item => 
+              items: currentData.items.map(item =>
                 item.itemId === itemId ? response.data : item
               )
             };
           },
-          false // Don't revalidate yet to avoid flickering
+          false
         );
-        
         // Then revalidate to ensure consistency with the server
         mutate();
         return response.data;
@@ -72,12 +72,10 @@ export function useFeedItems(searchParams: URLSearchParams) {
 
   // Helper function to delete an item and update the cache
   const deleteItem = useCallback(async (itemId: string) => {
-    // eslint-disable-next-line no-useless-catch
     try {
       const response = await feedItemsApi.delete(itemId);
-      
       if (response.status === 'success') {
-        // Revalidate to refetch the updated list
+        // Revalidate to fetch the updated list
         mutate();
         return response;
       }
@@ -87,13 +85,10 @@ export function useFeedItems(searchParams: URLSearchParams) {
   }, [mutate]);
 
   return {
-    feedItems: data?.items || [],
-    meta: data?.meta || {
-      total: 0,
-      page: 1,
-      limit: 10,
-      totalPages: 1
-    },
+    data: data?.items || [],
+    totalPages: data?.meta.totalPages || 0,
+    currentPage: data?.meta.page || 1,
+    totalCount: data?.meta.total || 0,
     isLoading,
     error,
     updateReadStatus,

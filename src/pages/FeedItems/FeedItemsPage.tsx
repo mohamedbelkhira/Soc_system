@@ -22,7 +22,7 @@ export function FeedItemsPage() {
   const { currentPage, handlePageChange } = usePagination(10);
   const { filters, setFilter, clearFilters, hasActiveFilters } = useFeedItemsFilters();
 
-  // Fetch feeds using SWR with an isLoading property
+  // Fetch feeds using SWR (unchanged)
   const { data: feeds = [], error: feedsError, isLoading: feedsLoading } = useSWR(
     '/feeds',
     async () => {
@@ -31,20 +31,24 @@ export function FeedItemsPage() {
         return response.data;
       }
       throw new Error(response.message || 'Failed to fetch feeds');
-    }
+    },
+    { revalidateOnFocus: false, shouldRetryOnError: false }
   );
 
-  // Use custom SWR hook for feed items
+  // Use the custom SWR hook for feed items, which returns a paginated structure
   const {
-    feedItems,
-    meta: paginationMeta,
+    data: feedItems,
+    totalPages,
+    currentPage: feedItemsPage, // current page from feed items response if needed
+    totalCount,
     isLoading,
     error: feedItemsError,
     updateReadStatus,
     deleteItem,
+    mutate,
   } = useFeedItems(searchParams);
 
-  // Initialize searchInputValue from URL params
+  // Initialize search input value from URL params
   useEffect(() => {
     const searchTermFromUrl = searchParams.get('searchTerm');
     setSearchInputValue(searchTermFromUrl || '');
@@ -93,8 +97,8 @@ export function FeedItemsPage() {
     try {
       await deleteItem(itemId);
       // If on the last page and this is the only item, go back one page
-      if (paginationMeta.page > 1 && feedItems.length === 1) {
-        handlePageChange(paginationMeta.page - 1);
+      if (currentPage > 1 && feedItems.length === 1) {
+        handlePageChange(currentPage - 1);
       }
       showToast('success', 'Feed item deleted successfully');
     } catch (error) {
@@ -104,10 +108,9 @@ export function FeedItemsPage() {
   };
 
   const toggleFilters = () => {
-    setShowFilters((prev) => !prev);
+    setShowFilters(prev => !prev);
   };
 
-  // Enhanced clearFilters function that resets the search input and clears filters
   const handleClearFilters = () => {
     setSearchInputValue('');
     clearFilters();
@@ -116,7 +119,7 @@ export function FeedItemsPage() {
   return (
     <Page>
       <PageHeader className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0" showBackButton>
-        <PageTitle>Feed Items ({paginationMeta.total})</PageTitle>
+        <PageTitle>Feed Items ({totalCount})</PageTitle>
         <div className="flex flex-wrap items-center gap-2">
           <Button
             variant={showFilters ? 'secondary' : 'outline'}
@@ -152,11 +155,13 @@ export function FeedItemsPage() {
           />
         </AnimatedFiltersWrapper>
         {feedItems.length === 0 ? (
-          <div className="text-center text-muted-foreground py-8">No feed items found</div>
+          <div className="text-center text-muted-foreground py-8">
+            No feed items found
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {feedItems.map((item) => (
+              {feedItems.map(item => (
                 <FeedItemCard
                   key={item.itemId}
                   item={item}
@@ -166,8 +171,8 @@ export function FeedItemsPage() {
               ))}
             </div>
             <CustomPagination
-              currentPage={currentPage}
-              totalPages={paginationMeta.totalPages}
+              currentPage={currentPage}  // using pagination state from usePagination
+              totalPages={totalPages}
               onPageChange={handlePageChange}
             />
           </>
