@@ -46,7 +46,7 @@ export const menuGroups: MenuGroup[] = [
     items: [
       {
         title: "RSS-Feeds",
-        url: "/feeds-items",
+        url: "/feeds-items?page=1&limit=10",
         icon: Newspaper,
       },
       {

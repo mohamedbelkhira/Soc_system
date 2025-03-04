@@ -25,7 +25,6 @@ export function FeedItemsPage() {
   const {
     data: feedItems,
     totalPages,
-    currentPage: feedItemsPage,
     totalCount,
     isLoading,
     error: feedItemsError,
