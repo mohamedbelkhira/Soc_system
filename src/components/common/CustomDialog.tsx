@@ -15,6 +15,7 @@ type CustomDialogProps = {
   children: ReactNode;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onOpenAutoFocus?: () => void; 
 };
 
 export default function CustomDialog({

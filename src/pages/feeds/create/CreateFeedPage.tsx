@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -16,8 +17,10 @@ import CustomDialog from "@/components/common/CustomDialog";
 import { CreateFeedDTO } from "@/dto/feed.dto";
 import { createFeedSchema } from "@/schemas/feeds/feed.schema";
 import { useCreateFeed } from "@/swr/feeds.swr";
+import { showToast } from "@/utils/showToast";
 
 export function CreateFeedDialog() {
+  const [isOpen, setIsOpen] = useState(false);
   const { createFeed, isCreating } = useCreateFeed();
 
   const form = useForm<CreateFeedDTO>({
@@ -32,14 +35,36 @@ export function CreateFeedDialog() {
   });
 
   const onSubmit = async (values: CreateFeedDTO) => {
-    await createFeed(values);
-    form.reset(); // Reset form after successful creation
+    try {
+      await createFeed(values);
+      setIsOpen(false); // Close dialog on successful creation
+      form.reset(); // Reset form after successful creation
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      showToast('error', 'Failed to create feed');
+    }
+  };
+
+  const handleCancel = () => {
+    setIsOpen(false);
+    form.reset(); // Reset form when canceling
   };
 
   return (
     <CustomDialog
       trigger={<Button>Créer un flux</Button>}
       title="Créer un nouveau flux"
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      onOpenAutoFocus={() => {
+        form.reset({
+          url: "",
+          title: "",
+          description: "",
+          active: true,
+          tags: [],
+        });
+      }}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -110,6 +135,14 @@ export function CreateFeedDialog() {
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isCreating}
+            >
+              Cancel
+            </Button>
             <Button type="submit" disabled={isCreating}>
               {isCreating ? "Creating..." : "Create"}
             </Button>

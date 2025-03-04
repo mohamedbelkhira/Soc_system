@@ -1,4 +1,4 @@
-
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -19,12 +19,14 @@ import { updateFeedSchema } from "@/schemas/feeds/feed.schema";
 import { FeedResponse } from "@/dto/feed.dto";
 import UpdateAction from "@/components/common/actions/UpdateAction";
 import { useUpdateFeed } from "@/swr/feeds.swr";
+import { showToast } from "@/utils/showToast";
 
 export function UpdateFeedDialog({
   feed,
 }: {
   feed: FeedResponse;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
   const { updateFeed, isUpdating } = useUpdateFeed();
 
   const form = useForm<UpdateFeedDTO>({
@@ -40,24 +42,35 @@ export function UpdateFeedDialog({
   });
 
   const onSubmit = async (values: UpdateFeedDTO) => {
-    await updateFeed({ id: feed.feedId, data: values });
+    try {
+      await updateFeed({ id: feed.feedId, data: values });
+      setIsOpen(false); // Close the dialog on successful update
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      showToast('error', 'Failed to update feed');
+    }
+  };
+
+  const handleCancel = () => {
+    setIsOpen(false);
+    form.reset(); // Reset the form to initial values
   };
 
   return (
     <CustomDialog
       trigger={<UpdateAction />}
       title="Update Feed"
-      onOpenChange={(isOpen) => {
-        if (isOpen) {
-          form.reset({
-            feedId: feed.feedId,
-            url: feed.url,
-            title: feed.title || "",
-            description: feed.description || "",
-            active: feed.active,
-            tags: feed.tags ? feed.tags.map(tag => tag.tagId) : [],
-          });
-        }
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      onOpenAutoFocus={() => {
+        form.reset({
+          feedId: feed.feedId,
+          url: feed.url,
+          title: feed.title || "",
+          description: feed.description || "",
+          active: feed.active,
+          tags: feed.tags ? feed.tags.map(tag => tag.tagId) : [],
+        });
       }}
     >
       <Form {...form}>
@@ -127,11 +140,12 @@ export function UpdateFeedDialog({
             )}
           />
 
-          {/* Action Buttons */}
+        
           <div className="flex justify-end gap-2">
             <Button
               type="button"
               variant="outline"
+              onClick={handleCancel}
               disabled={isUpdating}
             >
               Cancel
