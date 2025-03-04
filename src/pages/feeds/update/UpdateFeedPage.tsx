@@ -1,5 +1,6 @@
-// src/components/update/UpdateFeedDialog.tsx
-import { useEffect, useState } from "react";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -12,27 +13,19 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { showToast } from "@/utils/showToast";
-import { AxiosError } from "axios";
-import { ApiErrorResponse } from "@/types/error.type";
 import CustomDialog from "@/components/common/CustomDialog";
 import { UpdateFeedDTO } from "@/dto/feed.dto";
 import { updateFeedSchema } from "@/schemas/feeds/feed.schema";
-import { feedsApi } from "@/api/feeds.api";
-import UpdateAction from "@/components/common/actions/UpdateAction";
 import { FeedResponse } from "@/dto/feed.dto";
+import UpdateAction from "@/components/common/actions/UpdateAction";
+import { useUpdateFeed } from "@/swr/feeds.swr";
 
 export function UpdateFeedDialog({
   feed,
-  onUpdate,
 }: {
-    feed: FeedResponse;
-  onUpdate?: () => void;
+  feed: FeedResponse;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { updateFeed, isUpdating } = useUpdateFeed();
 
   const form = useForm<UpdateFeedDTO>({
     resolver: zodResolver(updateFeedSchema),
@@ -46,45 +39,26 @@ export function UpdateFeedDialog({
     },
   });
 
-  // Reset form values when the dialog opens
-  useEffect(() => {
-    if (isOpen) {
-      form.reset({
-        feedId: feed.feedId,
-        url: feed.url,
-        title: feed.title || "",
-        description: feed.description || "",
-        active: feed.active,
-        tags: feed.tags ? feed.tags.map(tag => tag.tagId) : [],
-      });
-    }
-  }, [isOpen, feed, form]);
-
   const onSubmit = async (values: UpdateFeedDTO) => {
-    setIsSubmitting(true);
-    try {
-      const response = await feedsApi.update(feed.feedId, values);
-      showToast(response.status, response.message);
-      setIsOpen(false);
-      onUpdate?.();
-    } catch (err) {
-      const error = err as AxiosError;
-      showToast(
-        "error",
-        (error.response?.data as ApiErrorResponse).message || "Failed to update feed"
-      );
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await updateFeed({ id: feed.feedId, data: values });
   };
 
   return (
     <CustomDialog
       trigger={<UpdateAction />}
       title="Update Feed"
-      isOpen={isOpen}
-      onOpenChange={setIsOpen}
+      onOpenChange={(isOpen) => {
+        if (isOpen) {
+          form.reset({
+            feedId: feed.feedId,
+            url: feed.url,
+            title: feed.title || "",
+            description: feed.description || "",
+            active: feed.active,
+            tags: feed.tags ? feed.tags.map(tag => tag.tagId) : [],
+          });
+        }
+      }}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -158,13 +132,12 @@ export function UpdateFeedDialog({
             <Button
               type="button"
               variant="outline"
-              onClick={() => setIsOpen(false)}
-              disabled={isSubmitting}
+              disabled={isUpdating}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Updating..." : "Update"}
+            <Button type="submit" disabled={isUpdating}>
+              {isUpdating ? "Updating..." : "Update"}
             </Button>
           </div>
         </form>

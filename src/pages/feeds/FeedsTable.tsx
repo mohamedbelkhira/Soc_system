@@ -16,15 +16,16 @@ import { Permission } from "@/types/permission.enum";
 import DeleteFeedDialog from "./delete/DeleteFeedDialog";
 import UpdateFeedDialog from "./update/UpdateFeedPage";
 import TableWrapper from "@/components/common/TableWrapper";
+// import { useFeeds } from "@/swr/feeds.swr";
 
 interface FeedsTableProps {
   isLoading: boolean;
   feeds: FeedResponse[];
-  onChange: () => void;
 }
 
-const FeedsTable: React.FC<FeedsTableProps> = ({ isLoading, feeds, onChange }) => {
+const FeedsTable: React.FC<FeedsTableProps> = ({ isLoading, feeds }) => {
   const { user } = useAuth();
+  // const { mutate } = useFeeds();
 
   if (isLoading) return <Skeleton className="w-full rounded-md min-h-24" />;
 
@@ -76,13 +77,13 @@ const FeedsTable: React.FC<FeedsTableProps> = ({ isLoading, feeds, onChange }) =
                       requiredPermission={Permission.FEEDS_EDIT}
                       grantedPermissions={user?.permissions}
                     >
-                      <UpdateFeedDialog feed={feed} onUpdate={onChange} />
+                      <UpdateFeedDialog feed={feed} />
                     </CheckPermission>
                     <CheckPermission
                       requiredPermission={Permission.FEEDS_DELETE}
                       grantedPermissions={user?.permissions}
                     >
-                      <DeleteFeedDialog feed={feed} onDelete={onChange} />
+                      <DeleteFeedDialog feed={feed} />
                     </CheckPermission>
                   </div>
                 </TableCell>

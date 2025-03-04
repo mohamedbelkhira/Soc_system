@@ -45,6 +45,7 @@ export function useFeedItems(searchParams: URLSearchParams) {
 
   // Helper function to mark an item as read/unread and update the cache
   const updateReadStatus = useCallback(async (itemId: string, status: boolean) => {
+    // eslint-disable-next-line no-useless-catch
     try {
       const response = await feedItemsApi.updateReadStatus(itemId, status);
       if (response.status === 'success') {
@@ -72,6 +73,7 @@ export function useFeedItems(searchParams: URLSearchParams) {
 
   // Helper function to delete an item and update the cache
   const deleteItem = useCallback(async (itemId: string) => {
+    // eslint-disable-next-line no-useless-catch
     try {
       const response = await feedItemsApi.delete(itemId);
       if (response.status === 'success') {

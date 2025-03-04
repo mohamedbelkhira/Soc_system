@@ -10,8 +10,7 @@ import { useFeedItemsFilters } from './useFeedItemsFilters';
 import FeedItemsFilters from './FeedItemsFilters';
 import CustomPagination from '@/components/common/CustomPagination';
 import AnimatedFiltersWrapper from '@/components/common/AnimatedFiltersWrapper';
-import useSWR from 'swr';
-import { feedsApi } from '@/api/feeds.api';
+import { useFeeds } from '@/swr/feeds.swr';
 import { useFeedItems } from '@/swr/feedItems.swr';
 
 export function FeedItemsPage() {
@@ -21,31 +20,17 @@ export function FeedItemsPage() {
 
   const { currentPage, handlePageChange } = usePagination(10);
   const { filters, setFilter, clearFilters, hasActiveFilters } = useFeedItemsFilters();
-
-  // Fetch feeds using SWR (unchanged)
-  const { data: feeds = [], error: feedsError, isLoading: feedsLoading } = useSWR(
-    '/feeds',
-    async () => {
-      const response = await feedsApi.getAll();
-      if (response.status === 'success') {
-        return response.data;
-      }
-      throw new Error(response.message || 'Failed to fetch feeds');
-    },
-    { revalidateOnFocus: false, shouldRetryOnError: false }
-  );
-
+  const { feeds, isLoading: feedsLoading, error: feedsError } = useFeeds();
   // Use the custom SWR hook for feed items, which returns a paginated structure
   const {
     data: feedItems,
     totalPages,
-    currentPage: feedItemsPage, // current page from feed items response if needed
+    currentPage: feedItemsPage,
     totalCount,
     isLoading,
     error: feedItemsError,
     updateReadStatus,
     deleteItem,
-    mutate,
   } = useFeedItems(searchParams);
 
   // Initialize search input value from URL params
@@ -171,7 +156,7 @@ export function FeedItemsPage() {
               ))}
             </div>
             <CustomPagination
-              currentPage={currentPage}  // using pagination state from usePagination
+              currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
             />

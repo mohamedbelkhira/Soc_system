@@ -1,39 +1,21 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import CustomDialog from '@/components/common/CustomDialog';
-import { feedsApi } from '@/api/feeds.api';
 import { FeedResponse } from '@/dto/feed.dto';
-import { showToast } from '@/utils/showToast';
-import { AxiosError } from 'axios';
-import { ApiErrorResponse } from '@/types/error.type';
 import { Trash2 } from 'lucide-react';
+import { useDeleteFeed } from '@/swr/feeds.swr';
 
 interface DeleteFeedDialogProps {
   feed: FeedResponse;
-  onDelete: () => void;
 }
 
-const DeleteFeedDialog: React.FC<DeleteFeedDialogProps> = ({ feed, onDelete }) => {
+const DeleteFeedDialog: React.FC<DeleteFeedDialogProps> = ({ feed }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { deleteFeed, isDeleting } = useDeleteFeed();
 
   const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      const response = await feedsApi.delete(feed.feedId);
-      showToast(response.status, response.message);
-      setIsOpen(false);
-      onDelete();
-    } catch (err) {
-      const error = err as AxiosError<ApiErrorResponse>;
-      showToast(
-        "error",
-        error.response?.data.message ?? "Échec de la suppression du flux"
-      );
-      console.error(error);
-    } finally {
-      setIsDeleting(false);
-    }
+    await deleteFeed(feed.feedId);
+    setIsOpen(false);
   };
 
   return (
