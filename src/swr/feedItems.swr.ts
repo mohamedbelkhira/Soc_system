@@ -18,6 +18,8 @@ export function useFeedItems(searchParams: URLSearchParams) {
   const fetcher = useCallback(async () => {
     // eslint-disable-next-line no-useless-catch
     try {
+      console.log('SWR key:', `/feeds-items?${searchParams.toString()}`);
+
       let response;
       if (feedId) {
         response = await feedItemsApi.getByFeedId(feedId, searchParams);

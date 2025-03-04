@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -12,9 +12,7 @@ import CustomDatePicker from "@/components/CustomDatePicker";
 import { FeedResponse } from "@/dto/feed.dto";
 import { FeedItemFilteringParams } from "./useFeedItemsFilters";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
-import SearchInput from "@/components/common/SearchInput";
-import { useDebounce } from "@/hooks/use-debounce";
+import { X, Search } from "lucide-react";
 
 interface FeedItemsFiltersProps {
   filters: FeedItemFilteringParams;
@@ -41,6 +39,14 @@ export default function FeedItemsFilters({
   searchInputValue,
   setSearchInputValue,
 }: FeedItemsFiltersProps) {
+  // Local state for search input with submit functionality
+  const [localSearchValue, setLocalSearchValue] = useState(searchInputValue);
+
+  // Update local search when props change
+  useEffect(() => {
+    setLocalSearchValue(searchInputValue);
+  }, [searchInputValue]);
+
   const handleFeedChange = (value: string) => {
     setFilter("feedId", value === "all" ? null : value);
   };
@@ -71,21 +77,32 @@ export default function FeedItemsFilters({
     }
   };
 
-  // Handle search input changes
+  // Handle local search input changes
   const handleSearchChange = (value: string) => {
-    // Update the controlled input value immediately
-    setSearchInputValue(value);
+    setLocalSearchValue(value);
   };
 
-  // Use the debounce hook with the controlled value
-  useDebounce(
-    searchInputValue,
-    400,
-    (debouncedValue) => {
-      // Only update the filter if the debounced value is different from current filter
-      setFilter("searchTerm", debouncedValue || null);
+  // Submit search filter directly (no debounce)
+  const handleSubmitSearch = () => {
+    setSearchInputValue(localSearchValue);
+    setFilter("searchTerm", localSearchValue || null);
+  };
+
+  // Handle enter key press
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSubmitSearch();
     }
-  );
+  };
+
+  // Clear a specific filter
+  const handleClearFilter = (key: keyof FeedItemFilteringParams) => {
+    if (key === "searchTerm") {
+      setLocalSearchValue("");
+      setSearchInputValue("");
+    }
+    setFilter(key, null);
+  };
 
   return (
     <Card className="mb-6">
@@ -139,7 +156,7 @@ export default function FeedItemsFilters({
           {/* Start Date Filter */}
           <div className="flex flex-col space-y-1">
             <CustomDatePicker
-              label="starting day"
+              label="Starting day"
               date={filters.startDate}
               onChange={handleStartDateChange}
             />
@@ -154,14 +171,32 @@ export default function FeedItemsFilters({
             />
           </div>
 
-          {/* Search Term */}
+          {/*change this component with a shadcn component*/}
           <div className="flex flex-col space-y-1 col-span-full">
-            <SearchInput
-              value={searchInputValue}
-              onChange={handleSearchChange}
-              label="Recherche"
-              placeholder="Chercher par mot dans le titre ou description..."
-            />
+            <label className="text-sm font-medium text-foreground">
+              Search
+            </label>
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={localSearchValue}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Search by word in title or description..."
+                  className="w-full px-3 py-2 border text-foreground bg-background border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-input"
+                />
+              </div>
+              <Button 
+                onClick={handleSubmitSearch}
+                type="button"
+                variant="secondary"
+                className="flex gap-1 items-center"
+              >
+                <Search className="h-4 w-4" />
+                Search
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -171,26 +206,36 @@ export default function FeedItemsFilters({
             {Object.entries(filters).map(([key, value]) => {
               if (value !== undefined && value !== null) {
                 let displayValue: string;
+                let displayKey: string = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
                 
                 if (key === "readStatus") {
                   displayValue = value ? "Read" : "Unread";
+                  displayKey = "Status";
                 } else if (key === "feedId") {
                   const feed = feeds.find(f => f.feedId === value);
                   displayValue = feed ? (feed.title || feed.url) : value as string;
-                } else if (key === "startDate" || key === "endDate") {
+                  displayKey = "Feed";
+                } else if (key === "startDate") {
                   displayValue = new Date(value as Date).toLocaleDateString();
+                  displayKey = "From";
+                } else if (key === "endDate") {
+                  displayValue = new Date(value as Date).toLocaleDateString();
+                  displayKey = "To";
+                } else if (key === "searchTerm") {
+                  displayValue = String(value);
+                  displayKey = "Search";
                 } else {
                   displayValue = String(value);
                 }
 
                 return (
                   <Badge key={key} className="flex items-center gap-1 px-2 py-1">
-                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}: {displayValue}
+                    {displayKey}: {displayValue}
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-4 w-4 p-0 ml-1"
-                      onClick={() => setFilter(key as keyof FeedItemFilteringParams, null)}
+                      onClick={() => handleClearFilter(key as keyof FeedItemFilteringParams)}
                     >
                       <X className="h-3 w-3" />
                     </Button>
