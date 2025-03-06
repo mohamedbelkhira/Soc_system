@@ -1,11 +1,10 @@
-
-
+import CyberAttackGlobalMap from "@/components/dashboard/CyberAttackGlobalMap";
 const DashboardPage = () => {
 
 
   return (
     <div className="space-y-8">
-    <p>hello world</p>
+    <CyberAttackGlobalMap/>
     </div>
   );
 };
