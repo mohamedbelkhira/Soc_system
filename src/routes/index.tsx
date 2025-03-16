@@ -67,7 +67,7 @@ const AppRoutes = () => {
         <Route
           path="/login"
           element={
-            !isAuthenticated ? <LoginPage /> : <Navigate to="/common" />
+            !isAuthenticated ? <LoginPage /> : <Navigate to="/feeds-items" />
           }
         />
 

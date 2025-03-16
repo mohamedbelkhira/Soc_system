@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import { format } from 'date-fns';
 import { 
   MoreHorizontal, 
@@ -30,6 +30,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { FeedItemResponse } from '@/dto/feedItem.dto';
+import certBE from '@/assets/images/feeds/cert_belgium.png';
+import Anssi from '@/assets/images/feeds/ansii_image.png';
+import canada from '@/assets/images/feeds/candaiamage.jpeg';
+import cisa from '@/assets/images/feeds/CISA-logo-B.jpeg';
+import itconnect from '@/assets/images/feeds/it-connect.png';
+import cerist from '@/assets/images/feeds/cerist.png';
+import ncsc from '@/assets/images/feeds/nscsd.webp';
+import austria from '@/assets/images/feeds/cert_at.png';
+import defaultFeedImage from '@/assets/images/feeds/default.jpeg';
 
 interface FeedItemCardProps {
   item: FeedItemResponse;
@@ -41,6 +50,32 @@ const FeedItemCard = ({ item, onReadStatusChange, onDelete }: FeedItemCardProps)
   const handleReadToggle = () => {
     onReadStatusChange?.(item.itemId, !item.readStatus);
   };
+  const feedImageMap = useMemo(() => ({
+    // Map specific feed IDs to specific images
+    'c68dd070-79f8-4681-b495-6391fd789576': certBE,
+    '5580d533-64d5-4d15-946f-a850a87d1ad7': canada,
+    'd129e7a5-8665-4e26-b564-3d0d7fa5785d': Anssi,
+    'dc93ea7c-af92-4acf-9ff8-5f998b3f0867': cisa,
+    '3e002689-b8a1-4326-959d-2ef371d66151': itconnect,
+    'bdc7aea6-aabb-4c92-a273-09bd584858c0': cerist,
+    'bbd60a30-fab4-42d3-a97f-44b6ae2e85ad': cisa,
+    'd85205e7-8c41-47d6-a4d0-f6aaa27b0fa6': ncsc,
+    'a044601d-c060-4f80-b696-5ac4db42149c': austria,
+   
+    // Add more mappings as needed
+  }), []);
+
+  const getFeedImage = () => {
+    const feedId = item.feedId;
+    
+   
+    if (feedId && feedImageMap[feedId]) {
+      return feedImageMap[feedId];
+    }
+    
+    return defaultFeedImage;
+  };
+
 
   const formatDate = (date: Date | undefined) => {
     if (!date) return 'No date';
@@ -58,21 +93,25 @@ const FeedItemCard = ({ item, onReadStatusChange, onDelete }: FeedItemCardProps)
 
   const ImageContainer = () => (
     <div className="w-full h-48 relative">
-      {item.imageUrl ? (
-        <img
-          src={item.imageUrl}
-          alt={item.title || 'Feed item'}
-          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
-        />
-      ) : (
-        <div className="w-full h-full bg-muted flex items-center justify-center">
-          <div className="text-center">
-            <Image className="h-12 w-12 mx-auto text-muted-foreground/50" />
-            <p className="text-sm text-muted-foreground mt-2">No image available</p>
-          </div>
-        </div>
-      )}
+    {item.imageUrl ? (
+      <img
+        src={item.imageUrl}
+        alt={item.title || 'Feed item'}
+        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+        loading="lazy"
+        onError={(e) => {
+          e.target.onerror = null; // Prevent infinite loop
+          e.target.src = getFeedImage();
+        }}
+      />
+    ) : (
+      <img
+        src={getFeedImage()}
+        alt={item.title || 'Feed item'}
+        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+        loading="lazy"
+      />
+    )}
       
       {/* Status indicator and dropdown - Positioned over the image/placeholder */}
       <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
