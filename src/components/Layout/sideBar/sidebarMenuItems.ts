@@ -29,17 +29,17 @@ export interface MenuGroup {
 }
 
 export const menuGroups: MenuGroup[] = [
-  {
-    group: "Principale",
-    icon: Home,
-    items: [
-      {
-        title: "Tableau de bord",
-        url: "/dashboard",
-        icon: Home,
-      },
-    ],
-  },
+  // {
+  //   group: "Principale",
+  //   icon: Home,
+  //   items: [
+  //     {
+  //       title: "Tableau de bord",
+  //       url: "/dashboard",
+  //       icon: Home,
+  //     },
+  //   ],
+  // },
   {
     group: "Feeds",
     icon: Euro,
