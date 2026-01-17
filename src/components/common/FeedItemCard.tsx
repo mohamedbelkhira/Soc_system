@@ -1,15 +1,16 @@
-import React, {useMemo} from 'react';
+import React, { useMemo, useState } from 'react';
 import { format } from 'date-fns';
-import { 
-  MoreHorizontal, 
-  ExternalLink, 
-  Clock, 
-  CheckCircle, 
+import {
+  MoreHorizontal,
+  ExternalLink,
+  Clock,
+  CheckCircle,
   XCircle,
   Calendar,
   Link as LinkIcon,
   Image,
-  Rss
+  Rss,
+  Tag
 } from 'lucide-react';
 import {
   Card,
@@ -39,14 +40,18 @@ import cerist from '@/assets/images/feeds/cerist.png';
 import ncsc from '@/assets/images/feeds/nscsd.webp';
 import austria from '@/assets/images/feeds/cert_at.png';
 import defaultFeedImage from '@/assets/images/feeds/default.jpeg';
+import ManageTagsDialog from '@/pages/FeedItems/ManageTagsDialog';
 
 interface FeedItemCardProps {
   item: FeedItemResponse;
   onReadStatusChange?: (itemId: string, status: boolean) => void;
   onDelete?: (itemId: string) => void;
+  onTagsUpdated?: (updatedItem: FeedItemResponse) => void;
 }
 
-const FeedItemCard = ({ item, onReadStatusChange, onDelete }: FeedItemCardProps) => {
+const FeedItemCard = ({ item, onReadStatusChange, onDelete, onTagsUpdated }: FeedItemCardProps) => {
+  const [isTagsDialogOpen, setIsTagsDialogOpen] = useState(false);
+
   const handleReadToggle = () => {
     onReadStatusChange?.(item.itemId, !item.readStatus);
   };
@@ -61,18 +66,18 @@ const FeedItemCard = ({ item, onReadStatusChange, onDelete }: FeedItemCardProps)
     'bbd60a30-fab4-42d3-a97f-44b6ae2e85ad': cisa,
     'd85205e7-8c41-47d6-a4d0-f6aaa27b0fa6': ncsc,
     'a044601d-c060-4f80-b696-5ac4db42149c': austria,
-   
+
     // Add more mappings as needed
   }), []);
 
   const getFeedImage = () => {
     const feedId = item.feedId;
-    
-   
+
+
     if (feedId && feedImageMap[feedId]) {
       return feedImageMap[feedId];
     }
-    
+
     return defaultFeedImage;
   };
 
@@ -93,26 +98,26 @@ const FeedItemCard = ({ item, onReadStatusChange, onDelete }: FeedItemCardProps)
 
   const ImageContainer = () => (
     <div className="w-full h-48 relative">
-    {item.imageUrl ? (
-      <img
-        src={item.imageUrl}
-        alt={item.title || 'Feed item'}
-        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-        loading="lazy"
-        onError={(e) => {
-          e.target.onerror = null; // Prevent infinite loop
-          e.target.src = getFeedImage();
-        }}
-      />
-    ) : (
-      <img
-        src={getFeedImage()}
-        alt={item.title || 'Feed item'}
-        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-        loading="lazy"
-      />
-    )}
-      
+      {item.imageUrl ? (
+        <img
+          src={item.imageUrl}
+          alt={item.title || 'Feed item'}
+          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null; // Prevent infinite loop
+            e.target.src = getFeedImage();
+          }}
+        />
+      ) : (
+        <img
+          src={getFeedImage()}
+          alt={item.title || 'Feed item'}
+          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
+      )}
+
       {/* Status indicator and dropdown - Positioned over the image/placeholder */}
       <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
         <Tooltip>
@@ -138,11 +143,15 @@ const FeedItemCard = ({ item, onReadStatusChange, onDelete }: FeedItemCardProps)
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={handleReadToggle}>
-              Mark as {item.readStatus ? 'unread' : 'read'}
+              Marquer comme {item.readStatus ? 'non lu' : 'lu'}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleCopyLink}>
               <LinkIcon className="mr-2 h-4 w-4" />
-              Copy link
+              Copier le lien
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setIsTagsDialogOpen(true)}>
+              <Tag className="mr-2 h-4 w-4" />
+              Gérer les tags
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {onDelete && (
@@ -150,7 +159,7 @@ const FeedItemCard = ({ item, onReadStatusChange, onDelete }: FeedItemCardProps)
                 className="text-red-600"
                 onClick={() => onDelete(item.itemId)}
               >
-                Delete
+                Supprimer
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
@@ -161,8 +170,8 @@ const FeedItemCard = ({ item, onReadStatusChange, onDelete }: FeedItemCardProps)
       <div className="absolute bottom-2 left-2 z-10">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Badge 
-              variant="secondary" 
+            <Badge
+              variant="secondary"
               className="bg-background/80 hover:bg-background/90 transition-colors flex items-center gap-1"
             >
               <Rss className="h-3 w-3" />
@@ -170,8 +179,8 @@ const FeedItemCard = ({ item, onReadStatusChange, onDelete }: FeedItemCardProps)
             </Badge>
           </TooltipTrigger>
           <TooltipContent>
-  {item.feed?.title || 'Unknown Feed'}
-        </TooltipContent>
+            {item.feed?.title || 'Unknown Feed'}
+          </TooltipContent>
 
         </Tooltip>
       </div>
@@ -179,70 +188,79 @@ const FeedItemCard = ({ item, onReadStatusChange, onDelete }: FeedItemCardProps)
   );
 
   return (
-    <Card className="group relative hover:shadow-lg transition-all duration-300 overflow-hidden">
-      <ImageContainer />
+    <>
+      <Card className="group relative hover:shadow-lg transition-all duration-300 overflow-hidden">
+        <ImageContainer />
 
-      <CardHeader className="pt-4">
-        <CardTitle className="line-clamp-2 hover:text-primary transition-colors">
-          {item.title || 'Untitled'}
-        </CardTitle>
+        <CardHeader className="pt-4">
+          <CardTitle className="line-clamp-2 hover:text-primary transition-colors">
+            {item.title || 'Untitled'}
+          </CardTitle>
 
-        <CardDescription className="flex items-center gap-2">
-          <Calendar className="h-4 w-4" />
-          {formatDate(item.publishedDate)}
-        </CardDescription>
-      </CardHeader>
+          <CardDescription className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            {formatDate(item.publishedDate)}
+          </CardDescription>
+        </CardHeader>
 
-      <CardContent>
-        <p className="text-sm text-muted-foreground line-clamp-3">
-          {truncateText(item.content, 200) || 'No content available'}
-        </p>
+        <CardContent>
+          <p className="text-sm text-muted-foreground line-clamp-3">
+            {truncateText(item.content, 200) || 'No content available'}
+          </p>
 
-        {item.tags && item.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            {item.tags.map((tag) => (
-              <Badge
-                key={tag.tagId}
-                variant="secondary"
-                style={{
-                  backgroundColor: tag.color ? `${tag.color}20` : undefined,
-                  color: tag.color,
-                }}
-                className="text-xs"
-              >
-                {tag.name}
-              </Badge>
-            ))}
-          </div>
-        )}
-      </CardContent>
-
-      <CardFooter className="justify-between">
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-2"
-          onClick={() => window.open(item.link, '_blank')}
-        >
-          <ExternalLink className="h-4 w-4" />
-          Read More
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleReadToggle}
-          className={item.readStatus ? 'text-green-500' : 'text-yellow-500'}
-        >
-          {item.readStatus ? (
-            <CheckCircle className="h-4 w-4 mr-2" />
-          ) : (
-            <XCircle className="h-4 w-4 mr-2" />
+          {item.tags && item.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {item.tags.map((tag) => (
+                <Badge
+                  key={tag.tagId}
+                  variant="secondary"
+                  style={{
+                    backgroundColor: tag.color ? `${tag.color}20` : undefined,
+                    color: tag.color,
+                  }}
+                  className="text-xs"
+                >
+                  {tag.name}
+                </Badge>
+              ))}
+            </div>
           )}
-          {item.readStatus ? 'Read' : 'Unread'}
-        </Button>
-      </CardFooter>
-    </Card>
+        </CardContent>
+
+        <CardFooter className="justify-between">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => window.open(item.link, '_blank')}
+          >
+            <ExternalLink className="h-4 w-4" />
+            Read More
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleReadToggle}
+            className={item.readStatus ? 'text-green-500' : 'text-yellow-500'}
+          >
+            {item.readStatus ? (
+              <CheckCircle className="h-4 w-4 mr-2" />
+            ) : (
+              <XCircle className="h-4 w-4 mr-2" />
+            )}
+            {item.readStatus ? 'Read' : 'Unread'}
+          </Button>
+        </CardFooter>
+      </Card>
+
+      <ManageTagsDialog
+        item={item}
+        isOpen={isTagsDialogOpen}
+        onOpenChange={setIsTagsDialogOpen}
+        onTagsUpdated={onTagsUpdated}
+      />
+    </>
   );
 };
 

@@ -34,15 +34,15 @@ const FeedsTable: React.FC<FeedsTableProps> = ({ isLoading, feeds }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[250px]">Titre</TableHead>
+            <TableHead className="w-[200px]">Titre</TableHead>
             <TableHead>URL</TableHead>
-            <TableHead className="hidden lg:table-cell w-[150px] text-center">
+            <TableHead className="hidden lg:table-cell w-[80px] text-center">
               Actif
             </TableHead>
-            <TableHead className="hidden lg:table-cell w-[150px] text-center">
+            <TableHead className="hidden xl:table-cell w-[140px] text-center">
               Dernière vérification
             </TableHead>
-            <TableHead className="hidden lg:table-cell w-[150px] text-center">
+            <TableHead className="hidden xl:table-cell w-[140px] text-center">
               Créé à
             </TableHead>
             <TableHead className="text-right w-[100px]">Actions</TableHead>
@@ -61,14 +61,14 @@ const FeedsTable: React.FC<FeedsTableProps> = ({ isLoading, feeds }) => {
                 <TableCell className="font-medium">
                   {feed.title || "Flux sans titre"}
                 </TableCell>
-                <TableCell>{feed.url}</TableCell>
+                <TableCell className="max-w-[200px] truncate" title={feed.url}>{feed.url}</TableCell>
                 <TableCell className="text-center hidden lg:table-cell">
                   {feed.active ? "Oui" : "Non"}
                 </TableCell>
-                <TableCell className="text-center hidden lg:table-cell">
+                <TableCell className="text-center hidden xl:table-cell">
                   {feed.lastChecked ? formatDate(feed.lastChecked) : '-'}
                 </TableCell>
-                <TableCell className="text-center hidden lg:table-cell">
+                <TableCell className="text-center hidden xl:table-cell">
                   {formatDate(feed.createdAt)}
                 </TableCell>
                 <TableCell className="text-right">

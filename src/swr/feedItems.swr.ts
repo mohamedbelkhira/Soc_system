@@ -16,13 +16,12 @@ const getPaginatedFeedItemsKey = (params: URLSearchParams) => {
 export function useFeedItems(searchParams: URLSearchParams) {
   // Memoize the key so that it only changes when the actual query string changes
   const key = useMemo(() => getPaginatedFeedItemsKey(searchParams), [searchParams.toString()]);
-  
+
   // Extract feedId for conditional fetching
   const feedId = searchParams.get('feedId');
-  
+
   // Define the fetcher function based on whether feedId is present
   const fetcher = useCallback(async () => {
-    console.log('SWR key:', key);
     let response;
     if (feedId) {
       response = await feedItemsApi.getByFeedId(feedId, searchParams);
@@ -86,6 +85,33 @@ export function useFeedItems(searchParams: URLSearchParams) {
     }
   }, [mutate]);
 
+  // Helper function to update tags on an item and update the cache
+  const updateTags = useCallback(async (itemId: string, tagIds: string[]) => {
+    try {
+      const response = await feedItemsApi.update(itemId, { tags: tagIds });
+      if (response.status === 'success') {
+        // Update cached data without a full refetch
+        mutate(
+          (currentData) => {
+            if (!currentData) return currentData;
+            return {
+              ...currentData,
+              items: currentData.items.map(item =>
+                item.itemId === itemId ? response.data : item
+              )
+            };
+          },
+          false
+        );
+        // Then revalidate to ensure consistency with the server
+        mutate();
+        return response.data;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }, [mutate]);
+
   return {
     data: data?.items || [],
     totalPages: data?.meta.totalPages || 0,
@@ -95,6 +121,8 @@ export function useFeedItems(searchParams: URLSearchParams) {
     error,
     updateReadStatus,
     deleteItem,
+    updateTags,
     mutate
   };
+
 }

@@ -37,7 +37,6 @@ export function UpdateFeedDialog({
       title: feed.title || "",
       description: feed.description || "",
       active: feed.active,
-      tags: feed.tags ? feed.tags.map(tag => tag.tagId) : [],
     },
   });
 
@@ -45,7 +44,7 @@ export function UpdateFeedDialog({
     try {
       await updateFeed({ id: feed.feedId, data: values });
       setIsOpen(false); // Close the dialog on successful update
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       showToast('error', 'Failed to update feed');
     }
@@ -69,7 +68,6 @@ export function UpdateFeedDialog({
           title: feed.title || "",
           description: feed.description || "",
           active: feed.active,
-          tags: feed.tags ? feed.tags.map(tag => tag.tagId) : [],
         });
       }}
     >
@@ -140,7 +138,6 @@ export function UpdateFeedDialog({
             )}
           />
 
-        
           <div className="flex justify-end gap-2">
             <Button
               type="button"

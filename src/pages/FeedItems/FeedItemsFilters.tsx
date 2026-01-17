@@ -13,10 +13,12 @@ import { FeedResponse } from "@/dto/feed.dto";
 import { FeedItemFilteringParams } from "./useFeedItemsFilters";
 import { Badge } from "@/components/ui/badge";
 import { X, Search } from "lucide-react";
+import TagsMultiSelect from "@/components/common/TagsMultiSelect";
+import { useTags } from "@/swr/tags.swr";
 
 interface FeedItemsFiltersProps {
   filters: FeedItemFilteringParams;
-  setFilter: (key: keyof FeedItemFilteringParams, value: string | boolean | Date | null | undefined) => void;
+  setFilter: (key: keyof FeedItemFilteringParams, value: string | boolean | Date | string[] | null | undefined) => void;
   clearFilters: () => void;
   hasActiveFilters: boolean;
   feeds: FeedResponse[];
@@ -39,6 +41,9 @@ export default function FeedItemsFilters({
   searchInputValue,
   setSearchInputValue,
 }: FeedItemsFiltersProps) {
+  // Get available tags for the filter
+  const { tags } = useTags();
+
   // Local state for search input with submit functionality
   const [localSearchValue, setLocalSearchValue] = useState(searchInputValue);
 
@@ -171,6 +176,18 @@ export default function FeedItemsFilters({
             />
           </div>
 
+          {/* Tags Filter */}
+          <div className="flex flex-col space-y-1 lg:col-span-2">
+            <label className="text-sm font-medium text-foreground">
+              Filter by Tags
+            </label>
+            <TagsMultiSelect
+              value={filters.tagIds || []}
+              onChange={(tagIds) => setFilter("tagIds", tagIds.length > 0 ? tagIds : null)}
+              placeholder="Select tags..."
+            />
+          </div>
+
           {/*change this component with a shadcn component*/}
           <div className="flex flex-col space-y-1 col-span-full">
             <label className="text-sm font-medium text-foreground">
@@ -187,7 +204,7 @@ export default function FeedItemsFilters({
                   className="w-full px-3 py-2 border text-foreground bg-background border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-input"
                 />
               </div>
-              <Button 
+              <Button
                 onClick={handleSubmitSearch}
                 type="button"
                 variant="secondary"
@@ -207,7 +224,7 @@ export default function FeedItemsFilters({
               if (value !== undefined && value !== null) {
                 let displayValue: string;
                 let displayKey: string = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                
+
                 if (key === "readStatus") {
                   displayValue = value ? "Read" : "Unread";
                   displayKey = "Status";
@@ -221,6 +238,13 @@ export default function FeedItemsFilters({
                 } else if (key === "endDate") {
                   displayValue = new Date(value as Date).toLocaleDateString();
                   displayKey = "To";
+                } else if (key === "tagIds") {
+                  const tagNames = (value as string[]).map(tagId => {
+                    const tag = tags.find(t => t.tagId === tagId);
+                    return tag?.name || tagId;
+                  });
+                  displayValue = tagNames.join(", ");
+                  displayKey = "Tags";
                 } else if (key === "searchTerm") {
                   displayValue = String(value);
                   displayKey = "Search";
@@ -244,10 +268,10 @@ export default function FeedItemsFilters({
               }
               return null;
             })}
-            
-            <Button 
-              variant="destructive" 
-              size="sm" 
+
+            <Button
+              variant="destructive"
+              size="sm"
               onClick={clearFilters}
               className="ml-auto"
             >

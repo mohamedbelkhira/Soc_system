@@ -1,6 +1,6 @@
 
 import {
- 
+
   Euro,
 
   Home,
@@ -9,6 +9,7 @@ import {
   Users,
   Rss,
   Newspaper,
+  Tag,
 } from "lucide-react";
 
 export interface MenuItem {
@@ -26,17 +27,17 @@ export interface MenuGroup {
 }
 
 export const menuGroups: MenuGroup[] = [
-  // {
-  //   group: "Principale",
-  //   icon: Home,
-  //   items: [
-  //     {
-  //       title: "Tableau de bord",
-  //       url: "/dashboard",
-  //       icon: Home,
-  //     },
-  //   ],
-  // },
+  {
+    group: "Principale",
+    icon: Home,
+    items: [
+      {
+        title: "Tableau de bord",
+        url: "/dashboard",
+        icon: Home,
+      },
+    ],
+  },
   {
     group: "Feeds",
     icon: Euro,
@@ -50,8 +51,13 @@ export const menuGroups: MenuGroup[] = [
         title: "RSS-Sources",
         url: "/feeds",
         icon: Rss,
-      }
-    
+      },
+      {
+        title: "Tags",
+        url: "/tags",
+        icon: Tag,
+      },
+
     ],
   },
 
@@ -69,7 +75,12 @@ export const menuGroups: MenuGroup[] = [
         url: "/users",
         icon: Users,
       },
+      {
+        title: "Settings",
+        url: "/settings",
+        icon: Settings,
+      },
     ],
   }
-  
+
 ];

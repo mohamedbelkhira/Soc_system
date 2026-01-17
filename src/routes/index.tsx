@@ -9,13 +9,16 @@ import UsersPage from "@/pages/user/UsersPage";
 const Layout = lazy(() => import("@/layouts/layout.js"));
 // Lazy load pages
 const LoginPage = lazy(() => import("@/pages/LoginPage.js"));
-const DashboardPage = lazy(() => import("@/pages/DashboardPage.js"));
+const DashboardPage = lazy(() => import("@/pages/dashboard/DashboardPage"));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage.js"));
 const CommonCompnentsPage = lazy(() => import("@/pages/CommonComponentsPage"));
 
 const RolesPage = lazy(() => import("@/pages/roles/RolesPage"));
 const CreateRolePage = lazy(() => import("@/pages/roles/create/CreateRolePage"));
 const UpdateRolePage = lazy(() => import("@/pages/roles/update/UpdateRolePage"));
+
+const TagsPage = lazy(() => import("@/pages/tags/TagsPage"));
+const SettingsPage = lazy(() => import("@/pages/settings/SettingsPage"));
 
 
 const ProtectedLayout = () => {
@@ -28,30 +31,32 @@ const ProtectedLayout = () => {
     // Save the attempted location for redirect after login
     return <Navigate to="/login" />;
   }
-  
-  return  (
+
+  return (
     <Layout>
       <Suspense fallback={<LoadingBar />}>
         <Routes>
-          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/feeds" element={<FeedsPage />} />
           <Route path="/feeds-items" element={<FeedItemsPage />} />
           <Route path="/roles" element={<RolesPage />} />
           <Route path="/role_add" element={<CreateRolePage />} />
           <Route path="/role_update/:id" element={<UpdateRolePage />} />
-          <Route path="/users" element={<UsersPage />} />
+          <Route path="/tags" element={<TagsPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+
           <Route path="/common" element={<CommonCompnentsPage />} />
 
-       
+
 
           {/* Catch-all route */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </Layout>
-  // ) : (
-  //   <Navigate to="/login" />
-  // );
+    // ) : (
+    //   <Navigate to="/login" />
+    // );
   )
 };
 

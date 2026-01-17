@@ -30,7 +30,6 @@ export function CreateFeedDialog() {
       title: "",
       description: "",
       active: true,
-      tags: [],
     },
   });
 
@@ -39,7 +38,7 @@ export function CreateFeedDialog() {
       await createFeed(values);
       setIsOpen(false); // Close dialog on successful creation
       form.reset(); // Reset form after successful creation
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       showToast('error', 'Failed to create feed');
     }
@@ -62,7 +61,6 @@ export function CreateFeedDialog() {
           title: "",
           description: "",
           active: true,
-          tags: [],
         });
       }}
     >

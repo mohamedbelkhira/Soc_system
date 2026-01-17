@@ -30,6 +30,8 @@ export function FeedItemsPage() {
     error: feedItemsError,
     updateReadStatus,
     deleteItem,
+    updateTags,
+    mutate,
   } = useFeedItems(searchParams);
 
   // Initialize search input value from URL params
@@ -89,6 +91,11 @@ export function FeedItemsPage() {
       showToast('error', 'Failed to delete feed item');
       console.error('Failed to delete feed item:', error);
     }
+  };
+
+  const handleTagsUpdated = () => {
+    // Revalidate the feed items list when tags are updated
+    mutate();
   };
 
   const toggleFilters = () => {
@@ -151,6 +158,7 @@ export function FeedItemsPage() {
                   item={item}
                   onReadStatusChange={handleReadStatusChange}
                   onDelete={handleDelete}
+                  onTagsUpdated={handleTagsUpdated}
                 />
               ))}
             </div>
