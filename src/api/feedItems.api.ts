@@ -32,27 +32,27 @@ export const feedItemsApi = {
       await apiClient.get(`?${params.toString()}`);
     return response.data;
   },
-  
+
   getById: async (itemId: string): Promise<ApiResponse<FeedItemResponse>> => {
     const response: AxiosResponse<ApiResponse<FeedItemResponse>> = await apiClient.get(`/${itemId}`);
     return response.data;
   },
-  
+
   create: async (feedItem: CreateFeedItemDTO): Promise<ApiResponse<FeedItemResponse>> => {
     const response: AxiosResponse<ApiResponse<FeedItemResponse>> = await apiClient.post('/', feedItem);
     return response.data;
   },
-  
+
   update: async (itemId: string, feedItem: UpdateFeedItemDTO): Promise<ApiResponse<FeedItemResponse>> => {
     const response: AxiosResponse<ApiResponse<FeedItemResponse>> = await apiClient.put(`/${itemId}`, feedItem);
     return response.data;
   },
-  
+
   delete: async (itemId: string): Promise<ApiResponse<null>> => {
     const response: AxiosResponse<ApiResponse<null>> = await apiClient.delete(`/${itemId}`);
     return response.data;
   },
-  
+
   // Additional helper method to update read status
   updateReadStatus: async (itemId: string, readStatus: boolean): Promise<ApiResponse<FeedItemResponse>> => {
     const response: AxiosResponse<ApiResponse<FeedItemResponse>> = await apiClient.put(`/${itemId}`, {
@@ -60,11 +60,25 @@ export const feedItemsApi = {
     });
     return response.data;
   },
-  
+
   // Helper method to get feed items by feed ID
   getByFeedId: async (feedId: string, params: URLSearchParams): Promise<PaginatedApiResponse<FeedItemResponse>> => {
-    const response: AxiosResponse<PaginatedApiResponse<FeedItemResponse>> = 
+    const response: AxiosResponse<PaginatedApiResponse<FeedItemResponse>> =
       await apiClient.get(`/feed/${feedId}?${params.toString()}`);
+    return response.data;
+  },
+
+  // AI Summarization method
+  summarize: async (itemId: string, forceRegenerate: boolean = false): Promise<ApiResponse<{ summary: string }>> => {
+    const response: AxiosResponse<ApiResponse<{ summary: string }>> = await apiClient.post(`/${itemId}/summarize`, {
+      forceRegenerate,
+    });
+    return response.data;
+  },
+
+  // AI Alert Bulletin method (French format)
+  generateBulletin: async (itemId: string): Promise<ApiResponse<{ bulletin: string }>> => {
+    const response: AxiosResponse<ApiResponse<{ bulletin: string }>> = await apiClient.post(`/${itemId}/bulletin`);
     return response.data;
   }
 };

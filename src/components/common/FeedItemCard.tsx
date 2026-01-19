@@ -10,7 +10,9 @@ import {
   Link as LinkIcon,
   Image,
   Rss,
-  Tag
+  Tag,
+  Sparkles,
+  ShieldAlert,
 } from 'lucide-react';
 import {
   Card,
@@ -41,6 +43,8 @@ import ncsc from '@/assets/images/feeds/nscsd.webp';
 import austria from '@/assets/images/feeds/cert_at.png';
 import defaultFeedImage from '@/assets/images/feeds/default.jpeg';
 import ManageTagsDialog from '@/pages/FeedItems/ManageTagsDialog';
+import SummaryDialog from '@/pages/FeedItems/SummaryDialog';
+import AlertBulletinDialog from '@/pages/FeedItems/AlertBulletinDialog';
 
 interface FeedItemCardProps {
   item: FeedItemResponse;
@@ -51,6 +55,8 @@ interface FeedItemCardProps {
 
 const FeedItemCard = ({ item, onReadStatusChange, onDelete, onTagsUpdated }: FeedItemCardProps) => {
   const [isTagsDialogOpen, setIsTagsDialogOpen] = useState(false);
+  const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
+  const [isBulletinDialogOpen, setIsBulletinDialogOpen] = useState(false);
 
   const handleReadToggle = () => {
     onReadStatusChange?.(item.itemId, !item.readStatus);
@@ -152,6 +158,14 @@ const FeedItemCard = ({ item, onReadStatusChange, onDelete, onTagsUpdated }: Fee
             <DropdownMenuItem onClick={() => setIsTagsDialogOpen(true)}>
               <Tag className="mr-2 h-4 w-4" />
               Gérer les tags
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setIsSummaryDialogOpen(true)}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Résumer avec l'IA
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setIsBulletinDialogOpen(true)}>
+              <ShieldAlert className="mr-2 h-4 w-4" />
+              Générer Bulletin d'Alerte
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {onDelete && (
@@ -259,6 +273,20 @@ const FeedItemCard = ({ item, onReadStatusChange, onDelete, onTagsUpdated }: Fee
         isOpen={isTagsDialogOpen}
         onOpenChange={setIsTagsDialogOpen}
         onTagsUpdated={onTagsUpdated}
+      />
+
+      <SummaryDialog
+        itemId={item.itemId}
+        itemTitle={item.title || 'Untitled'}
+        isOpen={isSummaryDialogOpen}
+        onOpenChange={setIsSummaryDialogOpen}
+      />
+
+      <AlertBulletinDialog
+        itemId={item.itemId}
+        itemTitle={item.title || 'Untitled'}
+        isOpen={isBulletinDialogOpen}
+        onOpenChange={setIsBulletinDialogOpen}
       />
     </>
   );

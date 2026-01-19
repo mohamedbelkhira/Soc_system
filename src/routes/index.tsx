@@ -41,6 +41,8 @@ const ProtectedLayout = () => {
           <Route path="/roles" element={<RolesPage />} />
           <Route path="/role_add" element={<CreateRolePage />} />
           <Route path="/role_update/:id" element={<UpdateRolePage />} />
+          <Route path="/role_update/:id" element={<UpdateRolePage />} />
+          <Route path="/users" element={<UsersPage />} />
           <Route path="/tags" element={<TagsPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/settings" element={<SettingsPage />} />
