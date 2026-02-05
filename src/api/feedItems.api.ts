@@ -77,8 +77,10 @@ export const feedItemsApi = {
   },
 
   // AI Alert Bulletin method (French format)
-  generateBulletin: async (itemId: string): Promise<ApiResponse<{ bulletin: string }>> => {
-    const response: AxiosResponse<ApiResponse<{ bulletin: string }>> = await apiClient.post(`/${itemId}/bulletin`);
+  generateBulletin: async (itemId: string, forceRegenerate: boolean = false): Promise<ApiResponse<{ bulletin: string }>> => {
+    const response: AxiosResponse<ApiResponse<{ bulletin: string }>> = await apiClient.post(`/${itemId}/bulletin`, {
+      forceRegenerate,
+    });
     return response.data;
   }
 };

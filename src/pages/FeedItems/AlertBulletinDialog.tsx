@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, ShieldAlert, Copy, Check, FileText } from 'lucide-react';
+import { Loader2, ShieldAlert, Copy, Check, FileText, RefreshCw } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
@@ -33,16 +33,19 @@ const AlertBulletinDialog: React.FC<AlertBulletinDialogProps> = ({
 
     useEffect(() => {
         if (isOpen && !bulletin && !isLoading) {
-            generateBulletin();
+            generateBulletin(false);
         }
     }, [isOpen]);
 
-    const generateBulletin = async () => {
+    const generateBulletin = async (forceRegenerate: boolean) => {
         setIsLoading(true);
         try {
-            const response = await feedItemsApi.generateBulletin(itemId);
+            const response = await feedItemsApi.generateBulletin(itemId, forceRegenerate);
             if (response.status === 'success') {
                 setBulletin(response.data.bulletin);
+                if (forceRegenerate) {
+                    showToast('success', 'Bulletin régénéré avec succès');
+                }
             } else {
                 throw new Error(response.message || 'Failed to generate alert bulletin');
             }
@@ -61,6 +64,10 @@ const AlertBulletinDialog: React.FC<AlertBulletinDialogProps> = ({
             showToast('success', 'Bulletin copied to clipboard');
             setTimeout(() => setIsCopied(false), 2000);
         }
+    };
+
+    const handleRegenerate = () => {
+        generateBulletin(true);
     };
 
     return (
@@ -133,6 +140,16 @@ const AlertBulletinDialog: React.FC<AlertBulletinDialogProps> = ({
                                 )}
                                 {isCopied ? 'Copié' : 'Copier le bulletin'}
                             </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleRegenerate}
+                                disabled={isLoading}
+                                className="border-red-900/30 hover:bg-red-950/20 hover:text-red-400"
+                            >
+                                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                                Régénérer
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -142,3 +159,4 @@ const AlertBulletinDialog: React.FC<AlertBulletinDialogProps> = ({
 };
 
 export default AlertBulletinDialog;
+
